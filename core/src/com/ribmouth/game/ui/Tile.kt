@@ -11,32 +11,25 @@ open class Tile(x: Float, y: Float, width: Float, height: Float) : Box(x, y, wid
     private val light: TextureRegion
     private val dark: TextureRegion
 
-    private val selected: Boolean = false
-    private var maxWidth: Float = width - 8
-    private var maxHeight: Float = height - 8
+    var selected: Boolean = false
 
     init {
         val atlas = Game.res.getAtlas("pack")!!
         light = atlas.findRegion("light")
         dark = atlas.findRegion("dark")
+
+        this.width -= 8
+        this.height -= 8
     }
 
     open fun update(dt: Float) {
-        if (width > maxWidth) {
-                width = maxWidth
-            }
-        if (width < 0) {
-                width = 0f
-            }
-        if (height > maxHeight) {
-                height = maxHeight
-            }
-        if (height < 0) {
-                height = 0f
-            }
     }
 
     open fun render(sb: SpriteBatch) {
-        sb.draw(light, x - width / 2, y - height / 2, width, height)
+        if(selected) {
+            sb.draw(light, x - width / 2, y - height / 2, width, height)
+        } else {
+            sb.draw(dark, x - width / 2, y - height / 2, width, height)
+        }
     }
 }

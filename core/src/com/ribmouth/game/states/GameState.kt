@@ -2,6 +2,7 @@ package com.ribmouth.game.states
 
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.math.Vector3
 import com.ribmouth.game.Game
 import com.ribmouth.game.handlers.GameStateManager
 
@@ -12,6 +13,7 @@ abstract class GameState(gsm: GameStateManager) {
     protected var gsm: GameStateManager = gsm
 
     lateinit protected var cam: OrthographicCamera
+    protected var mouse: Vector3 = Vector3.Zero
 
     init {
         cam = OrthographicCamera()
