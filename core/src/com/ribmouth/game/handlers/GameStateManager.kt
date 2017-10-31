@@ -21,7 +21,7 @@ class GameStateManager(game: Game) : Disposable {
     }
 
     fun update(dt: Float) {
-        this.gameStates.peek().update(dt);
+        this.gameStates.peek().update(dt)
     }
 
     fun render(sb: SpriteBatch) {

@@ -4,7 +4,9 @@ import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.ribmouth.game.handlers.Content
 import com.ribmouth.game.handlers.GameStateManager
+import com.ribmouth.game.states.PlayState
 
 class Game : ApplicationAdapter() {
 
@@ -28,6 +30,9 @@ class Game : ApplicationAdapter() {
         const val TITLE = "OMO"
         const val WIDTH = 480f
         const val HEIGHT= 800f
+
+        var res: Content = Content()
+            private set
     }
 
     override fun create() {
@@ -35,6 +40,12 @@ class Game : ApplicationAdapter() {
 
         sb = SpriteBatch()
         gsm = GameStateManager(this)
+
+        // load resources
+        res.loadAtlas("pack.pack", "pack")
+
+        //Push state
+        gsm.pushState(PlayState(gsm))
     }
 
     override fun render() {
