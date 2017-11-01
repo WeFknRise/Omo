@@ -22,6 +22,8 @@ abstract class GameState(gsm: GameStateManager) {
 
     //Abstract methods
     abstract fun handleInput()
+
     abstract fun update(dt: Float)
     abstract fun render(sb: SpriteBatch)
+    abstract fun dispose()
 }

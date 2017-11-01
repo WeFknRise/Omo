@@ -8,6 +8,7 @@ import com.ribmouth.game.handlers.Content
 import com.ribmouth.game.handlers.Difficulty
 import com.ribmouth.game.handlers.Difficulty.*
 import com.ribmouth.game.handlers.GameStateManager
+import com.ribmouth.game.states.MenuState
 import com.ribmouth.game.states.PlayState
 
 class Game : ApplicationAdapter() {
@@ -47,7 +48,7 @@ class Game : ApplicationAdapter() {
         res.loadAtlas("pack.pack", "pack")
 
         //Push state
-        gsm.pushState(PlayState(gsm, EASY))
+        gsm.pushState(MenuState(gsm))
     }
 
     override fun render() {

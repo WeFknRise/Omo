@@ -116,6 +116,10 @@ class PlayState(gsm: GameStateManager, difficulty: Difficulty) : GameState(gsm) 
         sb.end()
     }
 
+    override fun dispose() {
+
+    }
+
     private fun showObjective(dt: Float) {
         if(showing) {
             showTimer += dt
