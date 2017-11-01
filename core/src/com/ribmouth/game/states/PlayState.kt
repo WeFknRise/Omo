@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils.random
 import com.badlogic.gdx.utils.Array
 import com.ribmouth.game.Game
+import com.ribmouth.game.handlers.Difficulty
 import com.ribmouth.game.handlers.GameStateManager
 import com.ribmouth.game.ui.SizingTile
 import com.ribmouth.game.ui.Tile
@@ -12,7 +13,7 @@ import com.ribmouth.game.ui.Tile
 /**
  * Created by RibMouth on 31/10/2017.
  */
-class PlayState(gsm: GameStateManager) : GameState(gsm) {
+class PlayState(gsm: GameStateManager, difficulty: Difficulty) : GameState(gsm) {
     companion object {
         const val SHOW_TIMER: Float = 4.0f
         const val GLOW_ON_SECOND: Float = 3.0f
@@ -22,11 +23,12 @@ class PlayState(gsm: GameStateManager) : GameState(gsm) {
         const val MAX_FINGERS: Int = 2
     }
 
+    private var level: Int = 1
+    private var difficulty: Difficulty = difficulty
+
     private var tiles: ArrayList<ArrayList<SizingTile>> = arrayListOf()
-    //user selected
-    private var selected: Array<Tile> = Array()
-    //solution
-    private var finished: Array<Tile> = Array()
+    private var selected: Array<Tile> = Array() //user selected
+    private var finished: Array<Tile> = Array() //solution
 
     private var showing: Boolean = true
     private var showTimer: Float = 0.0f
@@ -36,8 +38,8 @@ class PlayState(gsm: GameStateManager) : GameState(gsm) {
     private var boardHeight: Float = -1f
 
     init {
-        createBoard(4, 4)
-        createFinished(3)
+        createBoard(difficulty.numRows, difficulty.numCols)
+        createFinished(difficulty.numGlowing(level))
     }
 
     override fun handleInput() {
@@ -56,8 +58,14 @@ class PlayState(gsm: GameStateManager) : GameState(gsm) {
                         selected.add(tile)
 
                         if(isFinished()) {
-                            createBoard(4, 4)
-                            createFinished(3)
+                            level++
+
+                            if(level > difficulty.maxLevel) {
+                                difficultyFinished()
+                            } else {
+                                createBoard(difficulty.numRows, difficulty.numCols)
+                                createFinished(difficulty.numGlowing(level))
+                            }
                         }
                     }
 
@@ -176,5 +184,9 @@ class PlayState(gsm: GameStateManager) : GameState(gsm) {
             finished.add(tiles[row][col])
             tiles[row][col].selected = true
         }
+    }
+
+    private fun difficultyFinished() {
+        Gdx.app.exit()
     }
 }

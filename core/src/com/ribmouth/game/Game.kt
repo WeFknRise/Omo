@@ -5,6 +5,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.ribmouth.game.handlers.Content
+import com.ribmouth.game.handlers.Difficulty
+import com.ribmouth.game.handlers.Difficulty.*
 import com.ribmouth.game.handlers.GameStateManager
 import com.ribmouth.game.states.PlayState
 
@@ -45,7 +47,7 @@ class Game : ApplicationAdapter() {
         res.loadAtlas("pack.pack", "pack")
 
         //Push state
-        gsm.pushState(PlayState(gsm))
+        gsm.pushState(PlayState(gsm, EASY))
     }
 
     override fun render() {
