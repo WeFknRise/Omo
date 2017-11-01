@@ -17,9 +17,6 @@ open class Tile(x: Float, y: Float, width: Float, height: Float) : Box(x, y, wid
         val atlas = Game.res.getAtlas("pack")!!
         light = atlas.findRegion("light")
         dark = atlas.findRegion("dark")
-
-        this.width -= 8
-        this.height -= 8
     }
 
     open fun update(dt: Float) {
