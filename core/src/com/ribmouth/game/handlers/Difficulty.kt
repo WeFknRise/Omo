@@ -4,7 +4,7 @@ package com.ribmouth.game.handlers
  * Created by RibMouth on 1/11/2017.
  */
 enum class Difficulty(val numRows: Int, val numCols: Int, val maxLevel: Int) {
-    BEGINNER(3, 3, 3),
+    NOOB(3, 3, 3),
     EASY(3, 3, 5),
     NORMAL(4, 4, 6),
     HARD(5, 5, 8),
@@ -12,7 +12,7 @@ enum class Difficulty(val numRows: Int, val numCols: Int, val maxLevel: Int) {
 
     fun numGlowing(currentLevel: Int): Int {
         when (this) {
-            BEGINNER -> return 1
+            NOOB -> return 1
             EASY -> {
                 if(currentLevel in 1..3) return 3
                 if(currentLevel in 4..5) return 4

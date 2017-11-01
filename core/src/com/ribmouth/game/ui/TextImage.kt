@@ -7,9 +7,10 @@ import com.ribmouth.game.Game
 /**
  * Created by RibMouth on 1/11/2017.
  */
-class TextImage(text: String, x: Float, y: Float) : Box(x, y, 50.0f * text.length, 50.0f) {
+class TextImage(text: String, x: Float, y: Float) : Box(x, y, 50.0f * text.length + SPACING * (text.length - 1), 50.0f) {
     companion object {
         const val SIZE = 50
+        const val SPACING = 4
     }
 
     private var fontSheets: Array<Array<TextureRegion>>
@@ -38,7 +39,7 @@ class TextImage(text: String, x: Float, y: Float) : Box(x, y, 50.0f * text.lengt
 
             val row = index / fontSheets[0].size
             val col = index % fontSheets[0].size
-            sb.draw(fontSheets[row][col], x - width / 2 + SIZE * i, y - height / 2)
+            sb.draw(fontSheets[row][col], (x - width / 2 + SIZE * i) + SPACING * i, y - height / 2)
         }
     }
 }

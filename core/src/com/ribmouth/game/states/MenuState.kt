@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.ribmouth.game.Game
-import com.ribmouth.game.handlers.Difficulty.BEGINNER
 import com.ribmouth.game.handlers.GameStateManager
 import com.ribmouth.game.ui.Graphic
 import com.ribmouth.game.ui.TextImage
@@ -24,7 +23,7 @@ class MenuState(gsm: GameStateManager) : GameState(gsm) {
             cam.unproject(mouse)
 
             if (play.contains(mouse.x, mouse.y)) {
-                gsm.setState(PlayState(gsm, BEGINNER))
+                gsm.setState(DifficultyState(gsm))
             }
         }
     }
