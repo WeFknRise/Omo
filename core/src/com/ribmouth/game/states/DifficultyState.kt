@@ -16,7 +16,17 @@ class DifficultyState(gsm: GameStateManager) : GameState(gsm) {
     private var backButton: TextImage = TextImage("back", Game.WIDTH / 2, 70.0f)
 
     override fun handleInput() {
+        if (Gdx.input.justTouched()) {
+            mouse.x = Gdx.input.x.toFloat()
+            mouse.y = Gdx.input.y.toFloat()
+            cam.unproject(mouse)
 
+            (0 until difficulties.size)
+                    .filter { difficulties[it].contains(mouse.x, mouse.y) }
+                    .forEach { gsm.setState(PlayState(gsm, Difficulty.values()[it])) }
+
+            if (backButton.contains(mouse.x, mouse.y)) gsm.setState(MenuState(gsm))
+        }
     }
 
     override fun update(dt: Float) {
