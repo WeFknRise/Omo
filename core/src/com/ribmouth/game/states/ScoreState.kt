@@ -39,4 +39,8 @@ class ScoreState(gsm: GameStateManager, score: Int) : GameState(gsm) {
     override fun dispose() {
 
     }
+
+    override fun resizeUser(width: Int, height: Int) {
+
+    }
 }

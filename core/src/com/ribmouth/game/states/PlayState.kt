@@ -2,6 +2,7 @@ package com.ribmouth.game.states
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils.random
 import com.badlogic.gdx.utils.Array
 import com.ribmouth.game.Game
@@ -9,6 +10,7 @@ import com.ribmouth.game.handlers.Difficulty
 import com.ribmouth.game.handlers.GameStateManager
 import com.ribmouth.game.ui.ScoreTextImage
 import com.ribmouth.game.ui.SizingTile
+import com.ribmouth.game.ui.TextImage
 import com.ribmouth.game.ui.Tile
 
 /**
@@ -21,6 +23,7 @@ class PlayState(gsm: GameStateManager, difficulty: Difficulty) : GameState(gsm) 
         const val LEVEL_TIMER: Float = 5.0f
         const val RIGHT_MULTIPLY: Float = 10.0f
         const val WRONG_DEDUCT: Float = 5.0f
+        const val TIME_WAIT_UNTIL_GOTO_SCORE_STATE: Int = 1
     }
 
     object MultiTouch {
@@ -44,77 +47,91 @@ class PlayState(gsm: GameStateManager, difficulty: Difficulty) : GameState(gsm) 
     private var boardOffset: Float = -1f
     private var boardHeight: Float = -1f
 
+    private var light: TextureRegion
+    private var dark: TextureRegion
+
+    private var prevPosTouched: kotlin.Array<Pair<Int, Int>> = kotlin.Array(MultiTouch.MAX_FINGERS, { _ -> Pair(-1, -1) })
+
+    // handle to wait after game is done then go to score state
+    private var isNeedToWaitBeforeTreatAsDone: Boolean = false
+    private var doneTimer: Float = 0.0f
+
+    // back button
+    private var backButton: TextImage = TextImage("back", Game.WIDTH / 2, 70f)
+
     init {
+        val texture = Game.res.getAtlas("pack")!!
+        light = texture.findRegion("light")
+        dark = texture.findRegion("dark")
+
         createBoard(difficulty.numRows, difficulty.numCols)
         createFinished(difficulty.numGlowing(level))
     }
 
     override fun handleInput() {
         for (i in 0 until MultiTouch.MAX_FINGERS) {
-            if (!showing && Gdx.input.isTouched(i)) {
+            if (Gdx.input.isTouched(i)) {
                 mouse.x = Gdx.input.getX(i).toFloat()
                 mouse.y = Gdx.input.getY(i).toFloat()
                 cam.unproject(mouse)
 
-                if (mouse.y >= boardOffset && mouse.y <= boardOffset + boardHeight) {
-                    val row: Int = ((mouse.y - boardOffset) / tileSize).toInt()
-                    val col: Int = (mouse.x / tileSize).toInt()
-
-
-                    val tile = tiles[row][col]
-                    if(!tile.selected) {
-                        tile.selected = true
-                        selected.add(tile)
-
-                        if(!finished.contains(tile)) score.addScore(-WRONG_DEDUCT)
-
-                        if(isFinished()) {
-                            level++
-
-                            val scoreToAdd = scoreTimer * RIGHT_MULTIPLY
-                            score.addScore(scoreToAdd)
-
-                            if(level > difficulty.maxLevel) {
-                                difficultyFinished()
-                            } else {
-                                createBoard(difficulty.numRows, difficulty.numCols)
-                                createFinished(difficulty.numGlowing(level))
-
-                                // reset scoreTextImage timer
-                                scoreTimer = LEVEL_TIMER
-                            }
-                        }
-                    }
-
-
-                    /*if (row >= 0 && row < tiles.count() && col >= 0 && col < tiles[row].count()) {
-                        val tile = tiles[row][col]
-                        tile.selected = !tile.selected
-
-                        if(tile.selected) {
-                            selected.add(tile)
-                        } else {
-                            selected.removeValue(tile, true)
-                        }
-                    }
-
-                    if(isFinished()) {
-                            level++
-
-                            val scoreToAdd = scoreTimer * RIGHT_MULTIPLY
-                            score.addScore(scoreToAdd)
-
-                            if(level > difficulty.maxLevel) {
-                                difficultyFinished()
-                            } else {
-                                createBoard(difficulty.numRows, difficulty.numCols)
-                                createFinished(difficulty.numGlowing(level))
-
-                                // reset scoreTextImage timer
-                                scoreTimer = LEVEL_TIMER
-                            }
-                        }*/
+                // back button
+                if (backButton.contains(mouse.x, mouse.y)) {
+                    //gsm.setState(TransitionState(gsm, this, io.wasin.omo.states.Difficulty(gsm), TransitionState.Type.EXPAND))
                 }
+
+                //tiles
+                if (!showing && !isNeedToWaitBeforeTreatAsDone) {
+                    if (mouse.y >= boardOffset && mouse.y <= boardOffset + boardHeight) {
+                        val row: Int = ((mouse.y - boardOffset) / tileSize).toInt()
+                        val col: Int = (mouse.x / tileSize).toInt()
+
+                        if (row >= 0 && row < tiles.count() && col >= 0 && col < tiles[row].count() &&
+                                (row != prevPosTouched[i].first || col != prevPosTouched[i].second)) {
+                            val tile = tiles[row][col]
+                            tile.selected = !tile.selected
+
+                            if (tile.selected) {
+                                selected.add(tile)
+
+                                if (!finished.contains(tile)) {
+                                    tile.wrong = true
+                                    score.addScore(-WRONG_DEDUCT)
+                                } else {
+                                    tile.wrong = false
+                                }
+                            } else {
+                                selected.removeValue(tile, true)
+                            }
+
+                            if (isFinished()) {
+                                level++
+
+                                val scoreToAdd = scoreTimer * RIGHT_MULTIPLY
+                                score.addScore(scoreToAdd)
+
+                                if (level > difficulty.maxLevel) {
+                                    isNeedToWaitBeforeTreatAsDone = true
+                                    doneTimer = 0f
+                                } else {
+                                    createBoard(difficulty.numRows, difficulty.numCols)
+                                    createFinished(difficulty.numGlowing(level))
+
+                                    // reset scoreTextImage timer
+                                    scoreTimer = LEVEL_TIMER
+                                }
+                            }
+                        }
+
+                        // save for previous touched position
+                        prevPosTouched[i] = Pair(row, col)
+                    }
+                }
+            }
+
+            // update previous position if not touch anymore
+            if (!Gdx.input.isTouched(i)) {
+                prevPosTouched[i] = Pair(-1, -1)
             }
         }
     }
@@ -133,6 +150,15 @@ class PlayState(gsm: GameStateManager, difficulty: Difficulty) : GameState(gsm) 
                 tiles[row][col].update(dt)
             }
         }
+
+        if (isNeedToWaitBeforeTreatAsDone) {
+            doneTimer += dt
+
+            if (doneTimer >= TIME_WAIT_UNTIL_GOTO_SCORE_STATE) {
+                // switch to another state thus no need to check whether code enter inside this statement again
+                difficultyFinished()
+            }
+        }
     }
 
     override fun render(sb: SpriteBatch) {
@@ -142,12 +168,25 @@ class PlayState(gsm: GameStateManager, difficulty: Difficulty) : GameState(gsm) 
         //render score
         score.render(sb)
 
+        // render level indicator
+        val allLevelsWidth = (2 * difficulty.maxLevel - 1) * 10
+        for (i in 0 until difficulty.maxLevel) {
+            if (i + 1 <= level) {
+                sb.draw(light, Game.WIDTH / 2 - allLevelsWidth / 2 + 20 * i, Game.HEIGHT - 125, 10f, 10f)
+            } else {
+                sb.draw(dark, Game.WIDTH / 2 - allLevelsWidth / 2 + 20 * i, Game.HEIGHT - 125, 10f, 10f)
+            }
+        }
+
         // render tiles
         for (row in 0 until tiles.count()) {
             for (col in 0 until tiles[row].count()) {
                 tiles[row][col].render(sb)
             }
         }
+
+        // render back button
+        backButton.render(sb)
 
         sb.end()
     }
@@ -156,18 +195,22 @@ class PlayState(gsm: GameStateManager, difficulty: Difficulty) : GameState(gsm) 
 
     }
 
+    override fun resizeUser(width: Int, height: Int) {
+
+    }
+
     private fun checkScoreTimer(dt: Float) {
-        if(!showing) {
+        if (!showing) {
             scoreTimer -= dt
         }
     }
 
     private fun showObjective(dt: Float) {
-        if(showing) {
+        if (showing) {
             showTimer += dt
 
-            if(showTimer > GLOW_ON_SECOND) {
-                if(showTimer % 0.15f < 0.07f) {
+            if (showTimer > GLOW_ON_SECOND) {
+                if (showTimer % 0.15f < 0.07f) {
                     for (f in finished) {
                         f.selected = true
                     }
@@ -178,7 +221,7 @@ class PlayState(gsm: GameStateManager, difficulty: Difficulty) : GameState(gsm) 
                 }
             }
 
-            if(showTimer > SHOW_TIMER) {
+            if (showTimer > SHOW_TIMER) {
                 showing = false
 
                 for (tile in finished) {
@@ -189,7 +232,7 @@ class PlayState(gsm: GameStateManager, difficulty: Difficulty) : GameState(gsm) 
     }
 
     private fun isFinished(): Boolean {
-        if(finished.count() != selected.count()) return false
+        if (finished.count() != selected.count()) return false
 
         return finished.all { selected.contains(it, true) }
     }
@@ -225,7 +268,7 @@ class PlayState(gsm: GameStateManager, difficulty: Difficulty) : GameState(gsm) 
             do {
                 row = random(tiles.count() - 1)
                 col = random(tiles[row].count() - 1)
-            } while(finished.contains(tiles[row][col], true))
+            } while (finished.contains(tiles[row][col], true))
 
             finished.add(tiles[row][col])
             tiles[row][col].selected = true

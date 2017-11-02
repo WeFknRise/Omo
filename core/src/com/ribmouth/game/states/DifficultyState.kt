@@ -50,4 +50,8 @@ class DifficultyState(gsm: GameStateManager) : GameState(gsm) {
     override fun dispose() {
 
     }
+
+    override fun resizeUser(width: Int, height: Int) {
+
+    }
 }

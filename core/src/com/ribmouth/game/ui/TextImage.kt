@@ -16,7 +16,7 @@ open class TextImage(text: String, x: Float, y: Float) : Box(x, y, 50.0f * text.
     private var fontSheets: Array<Array<TextureRegion>>
     var text: String = text.toLowerCase() //Only lower case as it is the same in the bitmap
         set(value) {
-            width = 50.0f
+            width = 50.0f * text.length + SPACING * (text.length - 1)
             field = value
         }
 
