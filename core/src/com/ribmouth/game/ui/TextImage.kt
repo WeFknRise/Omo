@@ -7,7 +7,7 @@ import com.ribmouth.game.Game
 /**
  * Created by RibMouth on 1/11/2017.
  */
-class TextImage(text: String, x: Float, y: Float) : Box(x, y, 50.0f * text.length + SPACING * (text.length - 1), 50.0f) {
+open class TextImage(text: String, x: Float, y: Float) : Box(x, y, 50.0f * text.length + SPACING * (text.length - 1), 50.0f) {
     companion object {
         const val SIZE = 50
         const val SPACING = 4

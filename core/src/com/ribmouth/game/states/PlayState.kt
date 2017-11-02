@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Array
 import com.ribmouth.game.Game
 import com.ribmouth.game.handlers.Difficulty
 import com.ribmouth.game.handlers.GameStateManager
+import com.ribmouth.game.ui.ScoreTextImage
 import com.ribmouth.game.ui.SizingTile
 import com.ribmouth.game.ui.Tile
 
@@ -17,11 +18,17 @@ class PlayState(gsm: GameStateManager, difficulty: Difficulty) : GameState(gsm) 
     companion object {
         const val SHOW_TIMER: Float = 4.0f
         const val GLOW_ON_SECOND: Float = 3.0f
+        const val LEVEL_TIMER: Float = 5.0f
+        const val RIGHT_MULTIPLY: Float = 10.0f
+        const val WRONG_DEDUCT: Float = 5.0f
     }
 
     object MultiTouch {
         const val MAX_FINGERS: Int = 2
     }
+
+    private var score: ScoreTextImage = ScoreTextImage(Game.WIDTH / 2, Game.HEIGHT - 70)
+    private var scoreTimer: Float = LEVEL_TIMER
 
     private var level: Int = 1
     private var difficulty: Difficulty = difficulty
@@ -52,19 +59,29 @@ class PlayState(gsm: GameStateManager, difficulty: Difficulty) : GameState(gsm) 
                 if (mouse.y >= boardOffset && mouse.y <= boardOffset + boardHeight) {
                     val row: Int = ((mouse.y - boardOffset) / tileSize).toInt()
                     val col: Int = (mouse.x / tileSize).toInt()
+
+
                     val tile = tiles[row][col]
                     if(!tile.selected) {
                         tile.selected = true
                         selected.add(tile)
 
+                        if(!finished.contains(tile)) score.addScore(-WRONG_DEDUCT)
+
                         if(isFinished()) {
                             level++
+
+                            val scoreToAdd = scoreTimer * RIGHT_MULTIPLY
+                            score.addScore(scoreToAdd)
 
                             if(level > difficulty.maxLevel) {
                                 difficultyFinished()
                             } else {
                                 createBoard(difficulty.numRows, difficulty.numCols)
                                 createFinished(difficulty.numGlowing(level))
+
+                                // reset scoreTextImage timer
+                                scoreTimer = LEVEL_TIMER
                             }
                         }
                     }
@@ -82,9 +99,21 @@ class PlayState(gsm: GameStateManager, difficulty: Difficulty) : GameState(gsm) 
                     }
 
                     if(isFinished()) {
-                        createBoard(5, 5)
-                        createFinished(3)
-                    }*/
+                            level++
+
+                            val scoreToAdd = scoreTimer * RIGHT_MULTIPLY
+                            score.addScore(scoreToAdd)
+
+                            if(level > difficulty.maxLevel) {
+                                difficultyFinished()
+                            } else {
+                                createBoard(difficulty.numRows, difficulty.numCols)
+                                createFinished(difficulty.numGlowing(level))
+
+                                // reset scoreTextImage timer
+                                scoreTimer = LEVEL_TIMER
+                            }
+                        }*/
                 }
             }
         }
@@ -93,6 +122,10 @@ class PlayState(gsm: GameStateManager, difficulty: Difficulty) : GameState(gsm) 
     override fun update(dt: Float) {
         handleInput()
         showObjective(dt)
+        checkScoreTimer(dt)
+
+        //score
+        score.update(dt)
 
         // tiles
         for (row in 0 until tiles.count()) {
@@ -106,6 +139,9 @@ class PlayState(gsm: GameStateManager, difficulty: Difficulty) : GameState(gsm) 
         sb.projectionMatrix = cam.combined
         sb.begin()
 
+        //render score
+        score.render(sb)
+
         // render tiles
         for (row in 0 until tiles.count()) {
             for (col in 0 until tiles[row].count()) {
@@ -118,6 +154,12 @@ class PlayState(gsm: GameStateManager, difficulty: Difficulty) : GameState(gsm) 
 
     override fun dispose() {
 
+    }
+
+    private fun checkScoreTimer(dt: Float) {
+        if(!showing) {
+            scoreTimer -= dt
+        }
     }
 
     private fun showObjective(dt: Float) {
@@ -191,6 +233,6 @@ class PlayState(gsm: GameStateManager, difficulty: Difficulty) : GameState(gsm) 
     }
 
     private fun difficultyFinished() {
-        Gdx.app.exit()
+        gsm.setState(MenuState(gsm))
     }
 }
