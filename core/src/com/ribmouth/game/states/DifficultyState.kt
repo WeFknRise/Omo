@@ -6,13 +6,14 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.ribmouth.game.Game
 import com.ribmouth.game.handlers.Difficulty
 import com.ribmouth.game.handlers.GameStateManager
+import com.ribmouth.game.states.TransitionState.Type.*
 import com.ribmouth.game.ui.TextImage
 
 /**
  * Created by RibMouth on 1/11/2017.
  */
 class DifficultyState(gsm: GameStateManager) : GameState(gsm) {
-    private var difficulties: Array<TextImage> = Array(Difficulty.values().size, { i -> TextImage(Difficulty.values()[i].name, Game.WIDTH / 2, Game.HEIGHT / 2 + 100 - 70 * i) })
+    private var difficulties: Array<TextImage> = Array(Difficulty.values().size, { i -> TextImage(Difficulty.values()[i].name, Game.WIDTH / 2, Game.HEIGHT / 2 + 140 - 70 * i) })
     private var backButton: TextImage = TextImage("back", Game.WIDTH / 2, 70.0f)
 
     override fun handleInput() {
@@ -23,9 +24,9 @@ class DifficultyState(gsm: GameStateManager) : GameState(gsm) {
 
             (0 until difficulties.size)
                     .filter { difficulties[it].contains(mouse.x, mouse.y) }
-                    .forEach { gsm.setState(PlayState(gsm, Difficulty.values()[it])) }
+                    .forEach { gsm.setState(TransitionState(gsm, this, PlayState(gsm, Difficulty.values()[it]), EXPAND)) }
 
-            if (backButton.contains(mouse.x, mouse.y)) gsm.setState(MenuState(gsm))
+            if (backButton.contains(mouse.x, mouse.y)) gsm.setState(TransitionState(gsm, this, MenuState(gsm), EXPAND))
         }
     }
 
@@ -41,6 +42,7 @@ class DifficultyState(gsm: GameStateManager) : GameState(gsm) {
 
         sb.begin()
         for (difficulty in difficulties) {
+            println("text: ${difficulty.text}, y: ${difficulty.y}")
             difficulty.render(sb)
         }
         backButton.render(sb)
@@ -48,6 +50,10 @@ class DifficultyState(gsm: GameStateManager) : GameState(gsm) {
     }
 
     override fun dispose() {
+
+    }
+
+    override fun resizeUser(width: Int, height: Int) {
 
     }
 }

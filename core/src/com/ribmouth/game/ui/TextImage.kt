@@ -7,7 +7,7 @@ import com.ribmouth.game.Game
 /**
  * Created by RibMouth on 1/11/2017.
  */
-class TextImage(text: String, x: Float, y: Float) : Box(x, y, 50.0f * text.length + SPACING * (text.length - 1), 50.0f) {
+open class TextImage(text: String, x: Float, y: Float) : Box(x, y, 50.0f * text.length + SPACING * (text.length - 1), 50.0f) {
     companion object {
         const val SIZE = 50
         const val SPACING = 4
@@ -16,7 +16,7 @@ class TextImage(text: String, x: Float, y: Float) : Box(x, y, 50.0f * text.lengt
     private var fontSheets: Array<Array<TextureRegion>>
     var text: String = text.toLowerCase() //Only lower case as it is the same in the bitmap
         set(value) {
-            width = 50.0f
+            width = 50.0f * text.length + SPACING * (text.length - 1)
             field = value
         }
 

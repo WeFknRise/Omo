@@ -7,8 +7,8 @@ package com.ribmouth.game.ui
  * By default, all classes in Kotlin are final
  */
 open class Box(x: Float, y: Float, width: Float, height: Float) {
-    protected var x: Float = x
-    protected var y: Float = y
+    var x: Float = x
+    var y: Float = y
     protected var width: Float = width
     protected var height: Float = height
 

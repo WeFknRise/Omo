@@ -26,4 +26,5 @@ abstract class GameState(gsm: GameStateManager) {
     abstract fun update(dt: Float)
     abstract fun render(sb: SpriteBatch)
     abstract fun dispose()
+    abstract fun resizeUser(width: Int, height: Int)
 }

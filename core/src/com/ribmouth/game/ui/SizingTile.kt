@@ -3,7 +3,7 @@ package com.ribmouth.game.ui
 /**
  * Created by RibMouth on 1/11/2017.
  */
-class SizingTile(x: Float, y: Float, width: Float, height: Float) : Tile(x, y, 0f, 0f) {
+open class SizingTile(x: Float, y: Float, width: Float, height: Float) : Tile(x, y, 0f, 0f) {
     protected var maxWidth: Float = width - 8
     protected var maxHeight: Float = height - 8
 
