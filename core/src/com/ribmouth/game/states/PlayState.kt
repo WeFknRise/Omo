@@ -233,6 +233,6 @@ class PlayState(gsm: GameStateManager, difficulty: Difficulty) : GameState(gsm) 
     }
 
     private fun difficultyFinished() {
-        gsm.setState(MenuState(gsm))
+        gsm.setState(ScoreState(gsm, score.destScore.toInt()))
     }
 }
