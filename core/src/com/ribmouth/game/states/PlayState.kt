@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Array
 import com.ribmouth.game.Game
 import com.ribmouth.game.handlers.Difficulty
 import com.ribmouth.game.handlers.GameStateManager
+import com.ribmouth.game.states.TransitionState.Type.*
 import com.ribmouth.game.ui.*
 
 /**
@@ -75,7 +76,7 @@ class PlayState(gsm: GameStateManager, difficulty: Difficulty) : GameState(gsm) 
 
                 // back button
                 if (backButton.contains(mouse.x, mouse.y)) {
-                    //gsm.setState(TransitionState(gsm, this, io.wasin.omo.states.Difficulty(gsm), TransitionState.Type.EXPAND))
+                    gsm.setState(TransitionState(gsm, this, DifficultyState(gsm), EXPAND))
                 }
 
                 //tiles
@@ -300,6 +301,6 @@ class PlayState(gsm: GameStateManager, difficulty: Difficulty) : GameState(gsm) 
     }
 
     private fun difficultyFinished() {
-        gsm.setState(ScoreState(gsm, score.destScore.toInt()))
+        gsm.setState(TransitionState(gsm, this, ScoreState(gsm, score.destScore.toInt()), EXPAND))
     }
 }

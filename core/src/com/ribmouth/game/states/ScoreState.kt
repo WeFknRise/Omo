@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.ribmouth.game.Game
 import com.ribmouth.game.handlers.GameStateManager
+import com.ribmouth.game.states.TransitionState.Type.*
 import com.ribmouth.game.ui.TextImage
 
 /**
@@ -16,7 +17,7 @@ class ScoreState(gsm: GameStateManager, score: Int) : GameState(gsm) {
 
     override fun handleInput() {
         if (Gdx.input.justTouched()) {
-            gsm.setState(MenuState(gsm))
+            gsm.setState(TransitionState(gsm, this, MenuState(gsm), EXPAND))
         }
     }
 
