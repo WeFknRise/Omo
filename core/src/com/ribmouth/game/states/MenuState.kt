@@ -14,7 +14,7 @@ import com.ribmouth.game.ui.TextImage
 class MenuState(gsm: GameStateManager) : GameState(gsm) {
     private var title: Graphic = Graphic(Game.res.getAtlas("pack")!!.findRegion("omo"), Game.WIDTH / 2, Game.HEIGHT / 2 + 100)
     private var play: TextImage = TextImage("play", Game.WIDTH / 2, Game.HEIGHT / 2 - 50)
-    private var highScore: TextImage = TextImage("scores", Game.WIDTH / 2, Game.HEIGHT / 2 - 130)
+    //private var highScore: TextImage = TextImage("scores", Game.WIDTH / 2, Game.HEIGHT / 2 - 130)
 
     override fun handleInput() {
         if (Gdx.input.justTouched()) {
@@ -41,7 +41,7 @@ class MenuState(gsm: GameStateManager) : GameState(gsm) {
 
         title.render(sb)
         play.render(sb)
-        highScore.render(sb)
+        //highScore.render(sb)
 
         sb.end()
     }
