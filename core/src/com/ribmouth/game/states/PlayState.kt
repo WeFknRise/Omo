@@ -8,10 +8,7 @@ import com.badlogic.gdx.utils.Array
 import com.ribmouth.game.Game
 import com.ribmouth.game.handlers.Difficulty
 import com.ribmouth.game.handlers.GameStateManager
-import com.ribmouth.game.ui.ScoreTextImage
-import com.ribmouth.game.ui.SizingTile
-import com.ribmouth.game.ui.TextImage
-import com.ribmouth.game.ui.Tile
+import com.ribmouth.game.ui.*
 
 /**
  * Created by RibMouth on 31/10/2017.
@@ -39,6 +36,7 @@ class PlayState(gsm: GameStateManager, difficulty: Difficulty) : GameState(gsm) 
     private var tiles: ArrayList<ArrayList<SizingTile>> = arrayListOf()
     private var selected: Array<Tile> = Array() //user selected
     private var finished: Array<Tile> = Array() //solution
+    private var glows: Array<GlowTile> = Array() //solution
 
     private var showing: Boolean = true
     private var showTimer: Float = 0.0f
@@ -90,18 +88,30 @@ class PlayState(gsm: GameStateManager, difficulty: Difficulty) : GameState(gsm) 
                                 (row != prevPosTouched[i].first || col != prevPosTouched[i].second)) {
                             val tile = tiles[row][col]
                             tile.selected = !tile.selected
+                            val glow = GlowTile(tile.x, tile.y, tileSize, tileSize)
 
                             if (tile.selected) {
                                 selected.add(tile)
 
                                 if (!finished.contains(tile)) {
                                     tile.wrong = true
+                                    glow.wrong = true
                                     score.addScore(-WRONG_DEDUCT)
                                 } else {
                                     tile.wrong = false
                                 }
+
+                                // add glow (grow type) effect
+                                glows.add(glow)
                             } else {
                                 selected.removeValue(tile, true)
+
+                                // add glow (shrink type) effect
+                                glow.type = GlowTile.Type.SHRINK
+                                if (tile.wrong) {
+                                    glow.wrong = true
+                                }
+                                glows.add(glow)
                             }
 
                             if (isFinished()) {
@@ -140,6 +150,15 @@ class PlayState(gsm: GameStateManager, difficulty: Difficulty) : GameState(gsm) 
         handleInput()
         showObjective(dt)
         checkScoreTimer(dt)
+
+        // update glows
+        for (i in glows.count()-1 downTo 0) {
+            glows[i].update(dt)
+
+            if (glows[i].shouldBeRemoved) {
+                glows.removeIndex(i)
+            }
+        }
 
         //score
         score.update(dt)
@@ -187,6 +206,11 @@ class PlayState(gsm: GameStateManager, difficulty: Difficulty) : GameState(gsm) 
 
         // render back button
         backButton.render(sb)
+
+        // render glow
+        for (g in glows) {
+            g.render(sb)
+        }
 
         sb.end()
     }

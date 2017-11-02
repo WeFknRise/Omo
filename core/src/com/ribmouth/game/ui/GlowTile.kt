@@ -16,9 +16,7 @@ class GlowTile(x: Float, y: Float, width: Float, height: Float, type: Type = Typ
     }
 
     private var alpha: Float = 1.0f
-
     var type: Type = type
-        private set
 
     var shouldBeRemoved: Boolean = false
     var timer: Float = 0f
